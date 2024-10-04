@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display CSV Data</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSV Data from S3</h1>
+    <table id="csvTable"></table>
+
+    <script>
+        // URL of your CSV file stored in S3 (ensure the S3 object is public)
+        const csvUrl = './code_report_format.csv';
+
+        // Function to fetch CSV data
+        async function fetchCSV() {
+            const response = await fetch(csvUrl);
+            const data = await response.text();
+
+            // Parse and display the CSV
+            displayCSV(data);
+        }
+
+        // Function to convert CSV text to HTML table
+        function displayCSV(data) {
+            const rows = data.split("\n");
+            let table = "<tr>";
+
+            // Add headers (first row)
+            const headers = rows[0].split(",");
+            headers.forEach(header => {
+                table += `<th>${header.trim()}</th>`;
+            });
+            table += "</tr>";
+
+            // Add rows (data)
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i].split(",");
+                table += "<tr>";
+                cols.forEach(col => {
+                    table += `<td>${col.trim()}</td>`;
+                });
+                table += "</tr>";
+            }
+
+            // Insert table into the HTML page
+            document.getElementById("csvTable").innerHTML = table;
+        }
+
+        // Call fetchCSV function on page load
+        fetchCSV();
+    </script>
+</body>
+</html>
